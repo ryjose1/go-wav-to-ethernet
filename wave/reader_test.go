@@ -18,4 +18,9 @@ func TestReadWaveFile(t *testing.T) {
 	batches := wave.BatchSamples(wav, 1.0)
 	fmt.Printf("%d", len(batches))
 
+	waveFmt := wave.NewWaveFmt(1, 2, 44100, 16, []byte{})
+	for i, batch := range batches {
+		wave.WriteFrames(batch, waveFmt, fmt.Sprintf("../test/birds._pt%d.wav", i))
+	}
+
 }
