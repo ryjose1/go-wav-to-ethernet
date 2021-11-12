@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/ryjose1/go-wav-to-ethernet/config"
-
 	"github.com/DylanMeeus/GoAudio/wave"
 )
 
@@ -59,26 +57,25 @@ func rescaleFrame(s wave.Frame, bits int) int {
 	return int(rescaled)
 }
 
-func GenerateBatches() [][]wave.Frame {
-	filepath := config.WaveFile
+func GenerateBatches(filepath string, batchDuration float64) [][]wave.Frame {
 	wav, err := wave.ReadWaveFile(filepath)
 	if err != nil {
 		fmt.Printf("Could not read wave file: %v", err)
 	}
 
-	return wave.BatchSamples(wav, config.MaxSecondsPerPacket)
+	return wave.BatchSamples(wav, batchDuration)
+}
+
+func DefaultWaveFmt() wave.WaveFmt {
+	return wave.NewWaveFmt(1, 2, 44100, 32, []byte{})
 }
 
 func SamplesToPayload(batch []wave.Frame) []byte {
-	waveFmt := wave.NewWaveFmt(1, 2, 44100, 16, []byte{})
-	/*
-		if i == 0 {
-			TestOutputFormat := "./test/birds._pt%d.wav"
-			wave.WriteFrames(batch, waveFmt, fmt.Sprintf(TestOutputFormat, i))
-			// 2 bytes of data per frame in 16bits/sample rate, should have 759 packets
-			fmt.Printf("%d\n", len(batch))
+	return samplesToRawData(batch, DefaultWaveFmt())
+}
 
-		}
-	*/
-	return samplesToRawData(batch, waveFmt)
+func WriteBatchToFile(batch []wave.Frame, filename string) {
+	wave.WriteFrames(batch, DefaultWaveFmt(), fmt.Sprintf("./test/%s", filename))
+	// 2 bytes of data per frame in 16bits/sample rate, should have 759 packets
+	fmt.Printf("%d\n", len(batch))
 }

@@ -5,16 +5,16 @@ import (
 	"log"
 	"net"
 
+	"github.com/mdlayher/raw"
 	"github.com/ryjose1/go-wav-to-ethernet/config"
 	"github.com/ryjose1/go-wav-to-ethernet/ethernet"
 	"github.com/ryjose1/go-wav-to-ethernet/wave"
-
-	"github.com/mdlayher/raw"
 )
 
 func main() {
 	// Read file into batches
-	batches := wave.GenerateBatches()
+	filepath := fmt.Sprintf("./%s.wav", config.WaveFile)
+	batches := wave.GenerateBatches(filepath, config.OneSecond)
 
 	// Process chunks to build ethernet packet payloads
 	payloads := [][]byte{}
